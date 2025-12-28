@@ -32,12 +32,24 @@ app.use('/api/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/users', userRoutes);
 
+// Online Users Storage
+let onlineUsers = [];
+
 // Socket.io for Real-time Messaging
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
   socket.on('join_room', (userId) => {
     socket.join(userId);
+    
+    // Add user to online list if not already present
+    if (!onlineUsers.some((user) => user.userId === userId)) {
+      onlineUsers.push({ userId, socketId: socket.id });
+    }
+    
+    // Broadcast updated online users list
+    io.emit('get_online_users', onlineUsers);
+    
     console.log(`User with ID: ${userId} joined room: ${userId}`);
   });
 
@@ -46,8 +58,21 @@ io.on('connection', (socket) => {
     socket.to(data.receiver).emit('receive_message', data);
   });
 
+  // Typing Indicators
+  socket.on('typing', (data) => {
+    // data: { receiverId, senderId }
+    socket.to(data.receiverId).emit('display_typing', { senderId: data.senderId });
+  });
+
+  socket.on('stop_typing', (data) => {
+    socket.to(data.receiverId).emit('hide_typing', { senderId: data.senderId });
+  });
+
   socket.on('disconnect', () => {
     console.log('User disconnected', socket.id);
+    // Remove user from online list
+    onlineUsers = onlineUsers.filter((user) => user.socketId !== socket.id);
+    io.emit('get_online_users', onlineUsers);
   });
 });
 

@@ -9,7 +9,10 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState('');
   const [receiverId, setReceiverId] = useState(null);
   const [users, setUsers] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]); // Store IDs of online users
+  const [isTyping, setIsTyping] = useState(false); // State for displaying typing indicator
   const socket = useRef();
+  const typingTimeoutRef = useRef(null);
 
   // Fetch all users
   useEffect(() => {
@@ -38,17 +41,39 @@ const Chat = () => {
       }
     };
     fetchMessages();
+    setIsTyping(false); // Reset typing indicator when switching users
   }, [receiverId, user.id]);
 
   useEffect(() => {
     socket.current = io('http://localhost:5001');
     socket.current.emit('join_room', user.id);
 
+    // Listen for online users update
+    socket.current.on('get_online_users', (users) => {
+      // users is an array of { userId, socketId }
+      // We just need the userIds
+      setOnlineUsers(users.map(u => u.userId));
+    });
+
     socket.current.on('receive_message', (data) => {
       // Only append if the message is from the person we are currently chatting with
       if (data.sender === receiverId || data.sender === user.id) {
          setMessages((prev) => [...prev, data]);
          markAsRead(data._id);
+         setIsTyping(false); // Hide typing indicator when message received
+      }
+    });
+
+    // Listen for typing events
+    socket.current.on('display_typing', (data) => {
+      if (data.senderId === receiverId) {
+        setIsTyping(true);
+      }
+    });
+
+    socket.current.on('hide_typing', (data) => {
+      if (data.senderId === receiverId) {
+        setIsTyping(false);
       }
     });
 
@@ -57,8 +82,29 @@ const Chat = () => {
     };
   }, [user, receiverId]);
 
+  const handleTyping = (e) => {
+    setNewMessage(e.target.value);
+
+    if (!receiverId) return;
+
+    // Emit typing event
+    socket.current.emit('typing', { receiverId, senderId: user.id });
+
+    // Clear existing timeout
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
+    // Set timeout to stop typing after 2 seconds of inactivity
+    typingTimeoutRef.current = setTimeout(() => {
+      socket.current.emit('stop_typing', { receiverId, senderId: user.id });
+    }, 2000);
+  };
+
   const sendMessage = async () => {
     if (!newMessage || !receiverId) return;
+
+    // Clear typing timeout and emit stop_typing immediately
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    socket.current.emit('stop_typing', { receiverId, senderId: user.id });
 
     const messageData = {
       sender: user.id,
@@ -85,6 +131,10 @@ const Chat = () => {
     }
   };
 
+  const isUserOnline = (userId) => {
+    return onlineUsers.includes(userId);
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.sidebar}>
@@ -99,8 +149,14 @@ const Chat = () => {
                 backgroundColor: receiverId === u._id ? '#e1bee7' : 'transparent'
               }}
             >
-              <div style={styles.avatar}>{u.username.charAt(0).toUpperCase()}</div>
-              <span>{u.username}</span>
+              <div style={styles.avatarContainer}>
+                 <div style={styles.avatar}>{u.username.charAt(0).toUpperCase()}</div>
+                 {isUserOnline(u._id) && <div style={styles.onlineIndicator}></div>}
+              </div>
+              <div style={styles.userInfo}>
+                <span style={styles.username}>{u.username}</span>
+                <span style={styles.statusText}>{isUserOnline(u._id) ? 'Online' : 'Offline'}</span>
+              </div>
             </div>
           ))}
         </div>
@@ -109,7 +165,10 @@ const Chat = () => {
         {receiverId ? (
           <>
             <div style={styles.chatHeader}>
-               <h3>Chatting with {users.find(u => u._id === receiverId)?.username}</h3>
+               <div style={styles.headerInfo}>
+                  <h3>Chatting with {users.find(u => u._id === receiverId)?.username}</h3>
+                  {isUserOnline(receiverId) && <span style={styles.onlineBadge}>Online</span>}
+               </div>
                <div style={styles.securityNote}>
                 🔒 Messages auto-delete 5 mins after read.
               </div>
@@ -125,13 +184,18 @@ const Chat = () => {
                   <span style={styles.time}>{new Date(msg.createdAt).toLocaleTimeString()}</span>
                 </div>
               ))}
+              {isTyping && (
+                <div style={styles.typingIndicator}>
+                  <span>User is typing...</span>
+                </div>
+              )}
             </div>
             <div style={styles.inputArea}>
               <input
                 type="text"
                 placeholder="Type a message..."
                 value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
+                onChange={handleTyping}
                 style={styles.messageInput}
                 onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
               />
@@ -174,9 +238,12 @@ const styles = {
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
-    gap: '10px',
+    gap: '15px',
     borderBottom: '1px solid #eee',
     transition: 'background 0.2s',
+  },
+  avatarContainer: {
+    position: 'relative',
   },
   avatar: {
     width: '40px',
@@ -188,6 +255,27 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     fontWeight: 'bold',
+  },
+  onlineIndicator: {
+    position: 'absolute',
+    bottom: '0',
+    right: '0',
+    width: '12px',
+    height: '12px',
+    backgroundColor: '#4caf50',
+    borderRadius: '50%',
+    border: '2px solid white',
+  },
+  userInfo: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  username: {
+    fontWeight: '500',
+  },
+  statusText: {
+    fontSize: '0.75rem',
+    color: '#888',
   },
   chatArea: {
     flex: 1,
@@ -202,6 +290,19 @@ const styles = {
     alignItems: 'center',
     backgroundColor: '#fff',
   },
+  headerInfo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+  },
+  onlineBadge: {
+    fontSize: '0.7rem',
+    backgroundColor: '#e8f5e9',
+    color: '#2e7d32',
+    padding: '2px 8px',
+    borderRadius: '10px',
+    fontWeight: 'bold',
+  },
   messages: {
     flex: 1,
     padding: '2rem',
@@ -210,6 +311,14 @@ const styles = {
     flexDirection: 'column',
     gap: '1rem',
     backgroundColor: '#f5f5f5',
+  },
+  typingIndicator: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'transparent',
+    color: '#888',
+    padding: '0.5rem 1rem',
+    fontSize: '0.8rem',
+    fontStyle: 'italic',
   },
   inputArea: {
     padding: '1.5rem',
