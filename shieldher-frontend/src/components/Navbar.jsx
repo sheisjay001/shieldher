@@ -29,7 +29,7 @@ const Navbar = () => {
 
         {user ? (
           <>
-            <Link to="/" style={styles.link}>Chat</Link>
+            <Link to="/chat" style={styles.link}>Chat</Link>
             <Link to="/community" style={styles.link}>Community</Link>
             {!user.isVerified && <Link to="/verification" style={styles.verifyLink}>Verify Now</Link>}
             

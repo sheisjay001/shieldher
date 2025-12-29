@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Chat from './pages/Chat';
 import Verification from './pages/Verification';
 import Community from './pages/Community';
+import Home from './pages/Home';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
@@ -24,6 +25,7 @@ function App() {
       <Router>
         <Navbar />
         <Routes>
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/verification" element={
@@ -36,7 +38,7 @@ function App() {
               <Community />
             </ProtectedRoute>
           } />
-          <Route path="/" element={
+          <Route path="/chat" element={
             <ProtectedRoute>
               <Chat />
             </ProtectedRoute>

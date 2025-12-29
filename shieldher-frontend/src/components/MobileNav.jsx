@@ -11,7 +11,7 @@ const MobileNav = () => {
 
   return (
     <div className="mobile-nav">
-      <Link to="/" className={`nav-item ${location.pathname === '/' ? 'active' : ''}`}>
+      <Link to="/chat" className={`nav-item ${location.pathname === '/chat' ? 'active' : ''}`}>
         <span className="icon">💬</span>
         <span className="label">Chat</span>
       </Link>
