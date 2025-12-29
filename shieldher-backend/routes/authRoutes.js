@@ -35,7 +35,8 @@ router.post('/register', async (req, res) => {
             username: newUser.username, 
             email: newUser.email, 
             isVerified: newUser.isVerified, 
-            verificationStatus: newUser.verificationStatus 
+            verificationStatus: newUser.verificationStatus,
+            role: newUser.role
         } 
     });
   } catch (err) {
@@ -54,7 +55,7 @@ router.post('/login', async (req, res) => {
     if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
 
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || 'secret', { expiresIn: '1h' });
-    res.json({ token, user: { id: user.id, username: user.username, email: user.email, isVerified: user.isVerified, verificationStatus: user.verificationStatus } });
+    res.json({ token, user: { id: user.id, username: user.username, email: user.email, isVerified: user.isVerified, verificationStatus: user.verificationStatus, role: user.role } });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
