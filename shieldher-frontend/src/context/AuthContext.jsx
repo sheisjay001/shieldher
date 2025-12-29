@@ -4,7 +4,7 @@ import axios from 'axios';
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001';
   const [user, setUser] = useState(() => {
     const userData = localStorage.getItem('user');
     return userData ? JSON.parse(userData) : null;
