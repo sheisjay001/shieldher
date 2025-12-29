@@ -1,46 +1,48 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const userSchema = new mongoose.Schema({
+const User = sequelize.define('User', {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
   username: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
     unique: true
   },
   email: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
     unique: true
   },
   password: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
-  // In a real app, we would have verification status here
   isVerified: {
-    type: Boolean,
-    default: false // Requires admin or AI verification
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
   },
   verificationStatus: {
-    type: String,
-    enum: ['unverified', 'pending', 'verified', 'rejected'],
-    default: 'unverified'
+    type: DataTypes.ENUM('unverified', 'pending', 'verified', 'rejected'),
+    defaultValue: 'unverified'
   },
   verificationImage: {
-    type: String, // Path to uploaded ID/Selfie
-    default: null
+    type: DataTypes.STRING,
+    defaultValue: null
   },
   profilePicture: {
-    type: String, // Path to uploaded profile picture
-    default: null
+    type: DataTypes.STRING,
+    defaultValue: null
   },
   inviteCode: {
-    type: String, // If used invite code
-    default: null
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
+    type: DataTypes.STRING,
+    defaultValue: null
   }
+}, {
+  timestamps: true
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = User;

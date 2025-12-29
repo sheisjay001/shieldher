@@ -1,9 +1,9 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const http = require('http');
 const path = require('path');
 const { Server } = require('socket.io');
+const { sequelize } = require('./models'); // Import sequelize from models/index.js
 require('dotenv').config();
 
 const authRoutes = require('./routes/authRoutes');
@@ -37,11 +37,17 @@ app.use((req, res, next) => {
 });
 
 // Database Connection
-const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/shieldher';
-
-mongoose.connect(mongoURI)
-.then(() => console.log('MongoDB Connected'))
-.catch(err => console.error('MongoDB Connection Error:', err));
+sequelize.authenticate()
+  .then(() => {
+    console.log('TiDB/MySQL Connected');
+    return sequelize.sync(); // Sync models with database
+  })
+  .then(() => {
+    console.log('Database Synced');
+  })
+  .catch(err => {
+    console.error('Database Connection Error:', err);
+  });
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -98,9 +104,5 @@ io.on('connection', (socket) => {
   });
 });
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok' });
-});
-
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
+const PORT = process.env.PORT || 5001;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

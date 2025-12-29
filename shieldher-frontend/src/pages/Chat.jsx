@@ -24,7 +24,7 @@ const Chat = () => {
       try {
         const res = await axios.get(`${API_BASE}/api/users`);
         // Filter out current user
-        setUsers(res.data.filter(u => u._id !== user.id));
+        setUsers(res.data.filter(u => u.id !== user.id));
       } catch (err) {
         console.error("Error fetching users:", err);
       }
@@ -70,7 +70,7 @@ const Chat = () => {
       // Only append if the message is from the person we are currently chatting with
       if (data.sender === receiverId || data.sender === user.id) {
          setMessages((prev) => [...prev, data]);
-         markAsRead(data._id);
+         markAsRead(data.id);
          setIsTyping(false); // Hide typing indicator when message received
       }
     });
@@ -148,9 +148,9 @@ const Chat = () => {
         <div className="user-list">
           {users.map((u) => (
             <div
-              key={u._id}
-              className={`user-item ${receiverId === u._id ? 'active' : ''}`}
-              onClick={() => handleUserSelect(u._id)}
+              key={u.id}
+              className={`user-item ${receiverId === u.id ? 'active' : ''}`}
+              onClick={() => handleUserSelect(u.id)}
             >
               <div className="avatar-container">
                 {u.profilePicture ? (
@@ -158,11 +158,11 @@ const Chat = () => {
                 ) : (
                     <div className="avatar">{u.username.charAt(0).toUpperCase()}</div>
                 )}
-                {onlineUsers.includes(u._id) && <div className="online-indicator"></div>}
+                {onlineUsers.includes(u.id) && <div className="online-indicator"></div>}
               </div>
               <div className="user-info">
                 <span className="username">{u.username}</span>
-                <span className="status-text">{onlineUsers.includes(u._id) ? 'Online' : 'Offline'}</span>
+                <span className="status-text">{onlineUsers.includes(u.id) ? 'Online' : 'Offline'}</span>
               </div>
             </div>
           ))}
@@ -175,12 +175,12 @@ const Chat = () => {
             <div className="chat-header">
               <button className="back-btn" onClick={handleBackToUsers}>←</button>
               <div className="chat-header-user">
-                {users.find(u => u._id === receiverId)?.profilePicture ? (
-                   <img src={`${API_BASE}/${users.find(u => u._id === receiverId)?.profilePicture}`} className="avatar-small" alt="User" />
+                {users.find(u => u.id === receiverId)?.profilePicture ? (
+                   <img src={`${API_BASE}/${users.find(u => u.id === receiverId)?.profilePicture}`} className="avatar-small" alt="User" />
                 ) : (
-                   <div className="avatar-small">{users.find(u => u._id === receiverId)?.username.charAt(0).toUpperCase()}</div>
+                   <div className="avatar-small">{users.find(u => u.id === receiverId)?.username.charAt(0).toUpperCase()}</div>
                 )}
-                <h4>{users.find(u => u._id === receiverId)?.username}</h4>
+                <h4>{users.find(u => u.id === receiverId)?.username}</h4>
               </div>
             </div>
             <div className="messages-container">

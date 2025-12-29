@@ -44,7 +44,7 @@ const Community = () => {
     try {
       const res = await axios.put(`${API_BASE}/api/posts/${postId}/like`, { userId: user.id });
       // Update local state
-      setPosts(posts.map(p => p._id === postId ? { ...p, likes: res.data.likes } : p));
+      setPosts(posts.map(p => p.id === postId ? { ...p, likes: res.data.likes } : p));
     } catch (err) {
       console.error(err);
     }
@@ -93,7 +93,7 @@ const Community = () => {
 
       <div className="posts-feed">
         {posts.map(post => (
-          <div key={post._id} className="post-card">
+          <div key={post.id} className="post-card">
             <div className="post-header">
               <div className="avatar small">{post.author?.username?.charAt(0).toUpperCase()}</div>
               <div className="post-meta">
@@ -107,13 +107,13 @@ const Community = () => {
             <div className="post-footer">
               <button 
                 className={`like-button ${post.likes.includes(user.id) ? 'liked' : ''}`}
-                onClick={() => handleLike(post._id)}
+                onClick={() => handleLike(post.id)}
               >
                 ❤️ {post.likes.length}
               </button>
               <button 
                 className="report-button"
-                onClick={() => handleReport(post._id)}
+                onClick={() => handleReport(post.id)}
                 title="Report this post"
               >
                 ⚠️ Report

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const User = require('../models/User');
+const { User } = require('../models');
 const path = require('path');
 
 // Configure multer storage
@@ -20,7 +20,7 @@ const upload = multer({ storage });
 router.post('/invite/:userId', async (req, res) => {
     try {
         const { inviteCode } = req.body;
-        const user = await User.findById(req.params.userId);
+        const user = await User.findByPk(req.params.userId);
         
         if (!user) return res.status(404).json({ error: 'User not found' });
 
@@ -28,7 +28,9 @@ router.post('/invite/:userId', async (req, res) => {
         if (inviteCode === 'WOMEN2025' || inviteCode === 'SHIELDHER') {
             user.isVerified = true;
             user.verificationStatus = 'verified';
-            user.verificationMethod = 'invite_code';
+            // user.verificationMethod = 'invite_code'; // Field not in new schema, omitting or adding if needed. Not in Mongoose schema either explicitly but maybe dynamic? 
+            // The Mongoose schema didn't have verificationMethod, but it allowed it? Mongoose strict mode is default true, so maybe it was ignored.
+            // I'll update schema if needed, but for now I'll just set inviteCode.
             user.inviteCode = inviteCode;
             await user.save();
             return res.json({ success: true, user });
@@ -45,13 +47,11 @@ router.post('/upload-id/:userId', upload.single('idImage'), async (req, res) => 
     try {
         if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
-        const user = await User.findById(req.params.userId);
+        const user = await User.findByPk(req.params.userId);
         if (!user) return res.status(404).json({ error: 'User not found' });
 
         user.verificationImage = req.file.path;
         user.verificationStatus = 'pending'; // Needs manual review
-        // For demo purposes, let's auto-verify if they upload something
-        // user.isVerified = true; 
         
         await user.save();
 
