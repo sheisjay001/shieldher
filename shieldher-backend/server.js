@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const http = require('http');
+const path = require('path');
 const { Server } = require('socket.io');
 require('dotenv').config();
 
@@ -39,7 +40,7 @@ app.use('/api/posts', postRoutes);
 app.use('/api/reports', reportRoutes);
 
 // Make uploads folder public
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Online Users Storage
 let onlineUsers = [];
