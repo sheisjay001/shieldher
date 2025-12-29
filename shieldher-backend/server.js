@@ -37,7 +37,7 @@ app.use((req, res, next) => {
 });
 
 // Database Connection
-const mongoURI = process.env.MONGO_URI || 'mongodb+srv://autajoy2003_db_user:GtmgUFGrtqmqFeP1@shieldher.dhuvl4l.mongodb.net/shieldher?appName=shieldher';
+const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/shieldher';
 
 mongoose.connect(mongoURI)
 .then(() => console.log('MongoDB Connected'))
