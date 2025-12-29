@@ -9,6 +9,7 @@ import Chat from './pages/Chat';
 import Verification from './pages/Verification';
 import Community from './pages/Community';
 import Home from './pages/Home';
+import Friends from './pages/Friends';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
@@ -41,6 +42,11 @@ function App() {
           <Route path="/chat" element={
             <ProtectedRoute>
               <Chat />
+            </ProtectedRoute>
+          } />
+          <Route path="/friends" element={
+            <ProtectedRoute>
+              <Friends />
             </ProtectedRoute>
           } />
         </Routes>

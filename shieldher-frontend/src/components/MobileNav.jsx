@@ -15,6 +15,10 @@ const MobileNav = () => {
         <span className="icon">💬</span>
         <span className="label">Chat</span>
       </Link>
+      <Link to="/friends" className={`nav-item ${location.pathname === '/friends' ? 'active' : ''}`}>
+        <span className="icon">🤝</span>
+        <span className="label">Network</span>
+      </Link>
       <Link to="/community" className={`nav-item ${location.pathname === '/community' ? 'active' : ''}`}>
         <span className="icon">👥</span>
         <span className="label">Community</span>

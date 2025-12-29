@@ -42,6 +42,11 @@ export const AuthProvider = ({ children }) => {
         throw new Error('Backend API not reachable');
       }
 
+      // Auto-login logic
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+      setUser(res.data.user);
+
       return { success: true };
     } catch (err) {
       console.error("Registration Error:", err);

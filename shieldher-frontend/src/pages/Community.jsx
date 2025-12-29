@@ -8,6 +8,7 @@ const Community = () => {
   const { user } = useContext(AuthContext);
   const [posts, setPosts] = useState([]);
   const [newPostContent, setNewPostContent] = useState('');
+  const [mediaFile, setMediaFile] = useState(null);
   const [error, setError] = useState('');
 
   const fetchPosts = async () => {
@@ -25,15 +26,24 @@ const Community = () => {
 
   const handleCreatePost = async (e) => {
     e.preventDefault();
-    if (!newPostContent.trim()) return;
+    if (!newPostContent.trim() && !mediaFile) return;
 
     try {
-      const res = await axios.post(`${API_BASE}/api/posts`, {
-        author: user.id,
-        content: newPostContent
+      const formData = new FormData();
+      formData.append('author', user.id);
+      formData.append('content', newPostContent);
+      if (mediaFile) {
+        formData.append('media', mediaFile);
+      }
+
+      const res = await axios.post(`${API_BASE}/api/posts`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
       setPosts([res.data, ...posts]);
       setNewPostContent('');
+      setMediaFile(null);
       setError('');
     } catch (err) {
       setError(err.response?.data?.error || "Failed to create post");
@@ -86,6 +96,16 @@ const Community = () => {
           />
           {error && <div className="post-error">{error}</div>}
           <div className="post-actions">
+            <input 
+                type="file" 
+                accept="image/*,video/*"
+                onChange={(e) => setMediaFile(e.target.files[0])}
+                className="file-input"
+                id="media-upload"
+            />
+            <label htmlFor="media-upload" className="upload-btn">
+                {mediaFile ? `📎 ${mediaFile.name}` : '📷 Add Media'}
+            </label>
             <button type="submit" className="post-button">Post</button>
           </div>
         </form>
@@ -101,9 +121,18 @@ const Community = () => {
                 <span className="post-date">{new Date(post.createdAt).toLocaleDateString()}</span>
               </div>
             </div>
-            <div className="post-content">
-              {post.content}
-            </div>
+            
+            {post.mediaUrl && (
+                <div className="post-media">
+                    {post.mediaType === 'video' ? (
+                        <video src={`${API_BASE}${post.mediaUrl}`} controls className="post-video" />
+                    ) : (
+                        <img src={`${API_BASE}${post.mediaUrl}`} alt="Post content" className="post-image" />
+                    )}
+                </div>
+            )}
+
+            <div className="post-content">{post.content}</div>
             <div className="post-footer">
               <button 
                 className={`like-button ${post.likes.includes(user.id) ? 'liked' : ''}`}

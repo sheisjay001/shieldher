@@ -9,7 +9,15 @@ const Post = sequelize.define('Post', {
   },
   content: {
     type: DataTypes.TEXT,
-    allowNull: false
+    allowNull: true // Can be null if only media is posted
+  },
+  mediaUrl: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  mediaType: {
+    type: DataTypes.ENUM('image', 'video', 'none'),
+    defaultValue: 'none'
   },
   authorId: {
     type: DataTypes.INTEGER,

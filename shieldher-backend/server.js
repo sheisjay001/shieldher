@@ -12,6 +12,7 @@ const userRoutes = require('./routes/userRoutes');
 const verificationRoutes = require('./routes/verificationRoutes');
 const postRoutes = require('./routes/postRoutes');
 const reportRoutes = require('./routes/reportRoutes');
+const friendRoutes = require('./routes/friendRoutes');
 
 const app = express();
 const server = http.createServer(app);
@@ -56,6 +57,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/verification', verificationRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/friends', friendRoutes);
 
 // Make uploads folder public
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

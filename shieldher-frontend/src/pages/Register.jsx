@@ -15,7 +15,7 @@ const Register = () => {
     e.preventDefault();
     const res = await register(username, email, password);
     if (res.success) {
-      navigate('/login');
+      navigate('/community');
     } else {
       setError(res.error);
     }

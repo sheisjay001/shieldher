@@ -42,8 +42,42 @@
 
 .post-actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     margin-top: 10px;
+}
+
+.file-input {
+    display: none;
+}
+
+.upload-btn {
+    cursor: pointer;
+    color: var(--primary-color);
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.upload-btn:hover {
+    background-color: var(--bg-hover);
+}
+
+.post-media {
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #000;
+    display: flex;
+    justify-content: center;
+    max-height: 500px; /* TikTok vertical style limit */
+}
+
+.post-image, .post-video {
+    max-width: 100%;
+    max-height: 500px;
+    object-fit: contain;
 }
 
 .post-button {

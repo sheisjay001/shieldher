@@ -2,6 +2,20 @@ const express = require('express');
 const router = express.Router();
 const { Post, User, PostLike, Comment } = require('../models');
 const { moderateContent } = require('../utils/moderation');
+const multer = require('multer');
+const path = require('path');
+
+// Configure Multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage });
 
 // Get all posts
 router.get('/', async (req, res) => {
@@ -33,12 +47,24 @@ router.get('/', async (req, res) => {
 });
 
 // Create a new post
-router.post('/', async (req, res) => {
+router.post('/', upload.single('media'), async (req, res) => {
   try {
     const { author, content } = req.body; // author is expected to be userId
+    let mediaUrl = null;
+    let mediaType = 'none';
+
+    if (req.file) {
+      mediaUrl = `/uploads/${req.file.filename}`;
+      const ext = path.extname(req.file.originalname).toLowerCase();
+      if (['.jpg', '.jpeg', '.png', '.gif'].includes(ext)) {
+        mediaType = 'image';
+      } else if (['.mp4', '.mov', '.webm'].includes(ext)) {
+        mediaType = 'video';
+      }
+    }
 
     // AI Safety Check
-    const moderationResult = moderateContent(content);
+    const moderationResult = moderateContent(content || '');
     let finalContent = content;
 
     if (!moderationResult.isSafe) {
@@ -51,7 +77,9 @@ router.post('/', async (req, res) => {
 
     const newPost = await Post.create({ 
         authorId: author, 
-        content: finalContent 
+        content: finalContent || '',
+        mediaUrl,
+        mediaType
     });
 
     // Fetch the created post with author info

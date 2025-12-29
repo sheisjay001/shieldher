@@ -25,7 +25,19 @@ router.post('/register', async (req, res) => {
       password: hashedPassword
     });
 
-    res.status(201).json({ message: 'User created successfully' });
+    // Auto-login after registration
+    const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET || 'secret', { expiresIn: '1h' });
+    
+    res.status(201).json({ 
+        token, 
+        user: { 
+            id: newUser.id, 
+            username: newUser.username, 
+            email: newUser.email, 
+            isVerified: newUser.isVerified, 
+            verificationStatus: newUser.verificationStatus 
+        } 
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

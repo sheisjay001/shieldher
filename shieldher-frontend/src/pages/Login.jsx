@@ -14,7 +14,7 @@ const Login = () => {
     e.preventDefault();
     const res = await login(email, password);
     if (res.success) {
-      navigate('/');
+      navigate('/community');
     } else {
       setError(res.error);
     }

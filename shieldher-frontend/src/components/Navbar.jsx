@@ -32,6 +32,7 @@ const Navbar = () => {
           <>
             <Link to="/chat" className="navbar-link">Chat</Link>
             <Link to="/community" className="navbar-link">Community</Link>
+            <Link to="/friends" className="navbar-link">Network</Link>
             {!user.isVerified && <Link to="/verification" className="navbar-verify-link">Verify Now</Link>}
             
             <div onClick={() => setShowProfile(true)} className="navbar-profile-container">
