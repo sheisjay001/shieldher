@@ -1,11 +1,30 @@
 const express = require('express');
 const router = express.Router();
 const Message = require('../models/Message');
+const { moderateContent } = require('../utils/moderation');
 
 // Send a message
 router.post('/', async (req, res) => {
   try {
     const { sender, receiver, content } = req.body;
+    
+    // AI Safety Check
+    const moderationResult = moderateContent(content);
+    
+    if (!moderationResult.isSafe) {
+        if (moderationResult.reasons.includes('harassment')) {
+            return res.status(400).json({ error: 'Message blocked: Harassment detected.' });
+        }
+        // If just profanity, we use the clean text
+        const newMessage = new Message({ 
+            sender, 
+            receiver, 
+            content: moderationResult.cleanText 
+        });
+        await newMessage.save();
+        return res.status(201).json(newMessage);
+    }
+
     const newMessage = new Message({ sender, receiver, content });
     await newMessage.save();
     res.status(201).json(newMessage);

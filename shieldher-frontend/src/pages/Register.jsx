@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import './Auth.css';
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -21,70 +22,43 @@ const Register = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <h2>Register</h2>
-      {error && <p style={styles.error}>{error}</p>}
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          style={styles.input}
-          required
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={styles.input}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={styles.input}
-          required
-        />
-        <button type="submit" style={styles.button}>Register</button>
-      </form>
+    <div className="auth-container">
+      <div className="auth-card">
+        <h2 className="auth-title">Join ShieldHer</h2>
+        {error && <p className="auth-error">{error}</p>}
+        <form onSubmit={handleSubmit} className="auth-form">
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="auth-input"
+            required
+          />
+          <input
+            type="email"
+            placeholder="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="auth-input"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="auth-input"
+            required
+          />
+          <button type="submit" className="auth-button">Sign Up</button>
+        </form>
+        <div className="auth-link">
+          Already have an account? <Link to="/login">Login here</Link>
+        </div>
+      </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    maxWidth: '400px',
-    margin: '2rem auto',
-    padding: '2rem',
-    boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-    borderRadius: '8px',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-  },
-  input: {
-    padding: '0.8rem',
-    borderRadius: '4px',
-    border: '1px solid #ddd',
-  },
-  button: {
-    padding: '0.8rem',
-    backgroundColor: '#6a1b9a',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-  },
-  error: {
-    color: 'red',
-    textAlign: 'center',
-  }
 };
 
 export default Register;

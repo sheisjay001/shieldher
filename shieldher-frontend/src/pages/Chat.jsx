@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import io from 'socket.io-client';
 import axios from 'axios';
+import './Chat.css';
 
 const Chat = () => {
   const { user } = useContext(AuthContext);
@@ -120,6 +121,11 @@ const Chat = () => {
       setNewMessage('');
     } catch (err) {
       console.error(err);
+      if (err.response && err.response.data && err.response.data.error) {
+        alert(err.response.data.error);
+      } else {
+        alert("Failed to send message.");
+      }
     }
   };
 
@@ -135,75 +141,89 @@ const Chat = () => {
     return onlineUsers.includes(userId);
   };
 
+  const handleBackToUsers = () => {
+    setReceiverId(null);
+  };
+
   return (
-    <div style={styles.container}>
-      <div style={styles.sidebar}>
-        <h3>Conversations</h3>
-        <div style={styles.userList}>
+    <div className="chat-container">
+      <div className={`sidebar ${receiverId ? 'hidden' : ''}`}>
+        <div className="sidebar-header">
+          <h3>Conversations</h3>
+        </div>
+        <div className="user-list">
           {users.map((u) => (
             <div 
               key={u._id} 
               onClick={() => setReceiverId(u._id)}
-              style={{
-                ...styles.userItem,
-                backgroundColor: receiverId === u._id ? '#e1bee7' : 'transparent'
-              }}
+              className={`user-item ${receiverId === u._id ? 'active' : ''}`}
             >
-              <div style={styles.avatarContainer}>
-                 <div style={styles.avatar}>{u.username.charAt(0).toUpperCase()}</div>
-                 {isUserOnline(u._id) && <div style={styles.onlineIndicator}></div>}
+              <div className="avatar-container">
+                 <div className="avatar">{u.username.charAt(0).toUpperCase()}</div>
+                 {isUserOnline(u._id) && <div className="online-indicator"></div>}
               </div>
-              <div style={styles.userInfo}>
-                <span style={styles.username}>{u.username}</span>
-                <span style={styles.statusText}>{isUserOnline(u._id) ? 'Online' : 'Offline'}</span>
+              <div className="user-info">
+                <span className="username">{u.username}</span>
+                <span className={`status-text ${isUserOnline(u._id) ? 'online' : ''}`}>
+                  {isUserOnline(u._id) ? 'Online' : 'Offline'}
+                </span>
               </div>
             </div>
           ))}
         </div>
       </div>
-      <div style={styles.chatArea}>
+      
+      {/* On mobile, if no receiver selected, we show sidebar only (handled by CSS hiding chat-area or showing empty state differently) */}
+      {/* Actually, with the 'hidden' class on sidebar, we just need to make sure chat-area takes full width */}
+      
+      <div className="chat-area" style={{ display: !receiverId && window.innerWidth <= 768 ? 'none' : 'flex' }}>
         {receiverId ? (
           <>
-            <div style={styles.chatHeader}>
-               <div style={styles.headerInfo}>
-                  <h3>Chatting with {users.find(u => u._id === receiverId)?.username}</h3>
-                  {isUserOnline(receiverId) && <span style={styles.onlineBadge}>Online</span>}
+            <div className="chat-header">
+               <div className="header-info">
+                  <button className="back-button" onClick={handleBackToUsers}>
+                    ←
+                  </button>
+                  <h3>{users.find(u => u._id === receiverId)?.username}</h3>
+                  {isUserOnline(receiverId) && <span className="online-badge">Online</span>}
                </div>
-               <div style={styles.securityNote}>
-                🔒 Messages auto-delete 5 mins after read.
+               <div className="security-note">
+                <span title="AI Content Moderation Active">🛡️ ShieldAI Active</span>
+                <span style={{marginLeft: '10px'}}>🔒 Auto-delete (5m)</span>
               </div>
             </div>
             
-            <div style={styles.messages}>
+            <div className="messages-list">
               {messages.map((msg, index) => (
                 <div 
                   key={index} 
-                  style={msg.sender === user.id ? styles.myMessage : styles.theirMessage}
+                  className={`message-bubble ${msg.sender === user.id ? 'mine' : 'theirs'}`}
                 >
-                  <p>{msg.content}</p>
-                  <span style={styles.time}>{new Date(msg.createdAt).toLocaleTimeString()}</span>
+                  <div className="message-content">{msg.content}</div>
+                  <span className="message-time">{new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                 </div>
               ))}
               {isTyping && (
-                <div style={styles.typingIndicator}>
+                <div className="typing-indicator">
                   <span>User is typing...</span>
                 </div>
               )}
             </div>
-            <div style={styles.inputArea}>
+            <div className="input-area">
               <input
                 type="text"
                 placeholder="Type a message..."
                 value={newMessage}
                 onChange={handleTyping}
-                style={styles.messageInput}
+                className="message-input"
                 onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
               />
-              <button onClick={sendMessage} style={styles.sendButton}>Send</button>
+              <button onClick={sendMessage} className="send-button">➤</button>
             </div>
           </>
         ) : (
-          <div style={styles.emptyState}>
+          <div className="empty-state">
+            <div className="empty-icon">💬</div>
             <h3>Select a user to start chatting</h3>
             <p>Choose from the list on the left</p>
           </div>
@@ -211,179 +231,6 @@ const Chat = () => {
       </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    display: 'flex',
-    height: 'calc(100vh - 80px)',
-    maxWidth: '1200px',
-    margin: '0 auto',
-    backgroundColor: '#fff',
-    boxShadow: '0 0 20px rgba(0,0,0,0.05)',
-  },
-  sidebar: {
-    width: '300px',
-    borderRight: '1px solid #eee',
-    backgroundColor: '#f9f9f9',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  userList: {
-    overflowY: 'auto',
-    flex: 1,
-  },
-  userItem: {
-    padding: '1rem',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '15px',
-    borderBottom: '1px solid #eee',
-    transition: 'background 0.2s',
-  },
-  avatarContainer: {
-    position: 'relative',
-  },
-  avatar: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '50%',
-    backgroundColor: '#6a1b9a',
-    color: 'white',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontWeight: 'bold',
-  },
-  onlineIndicator: {
-    position: 'absolute',
-    bottom: '0',
-    right: '0',
-    width: '12px',
-    height: '12px',
-    backgroundColor: '#4caf50',
-    borderRadius: '50%',
-    border: '2px solid white',
-  },
-  userInfo: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  username: {
-    fontWeight: '500',
-  },
-  statusText: {
-    fontSize: '0.75rem',
-    color: '#888',
-  },
-  chatArea: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  chatHeader: {
-    padding: '1rem 2rem',
-    borderBottom: '1px solid #eee',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-  headerInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-  },
-  onlineBadge: {
-    fontSize: '0.7rem',
-    backgroundColor: '#e8f5e9',
-    color: '#2e7d32',
-    padding: '2px 8px',
-    borderRadius: '10px',
-    fontWeight: 'bold',
-  },
-  messages: {
-    flex: 1,
-    padding: '2rem',
-    overflowY: 'auto',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-    backgroundColor: '#f5f5f5',
-  },
-  typingIndicator: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'transparent',
-    color: '#888',
-    padding: '0.5rem 1rem',
-    fontSize: '0.8rem',
-    fontStyle: 'italic',
-  },
-  inputArea: {
-    padding: '1.5rem',
-    borderTop: '1px solid #eee',
-    display: 'flex',
-    gap: '1rem',
-    backgroundColor: '#fff',
-  },
-  messageInput: {
-    flex: 1,
-    padding: '1rem',
-    borderRadius: '30px',
-    border: '1px solid #ddd',
-    outline: 'none',
-    fontSize: '1rem',
-  },
-  sendButton: {
-    padding: '0 2rem',
-    borderRadius: '30px',
-    border: 'none',
-    backgroundColor: '#6a1b9a',
-    color: 'white',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-  },
-  myMessage: {
-    alignSelf: 'flex-end',
-    backgroundColor: '#6a1b9a',
-    color: 'white',
-    padding: '1rem 1.5rem',
-    borderRadius: '20px 20px 0 20px',
-    maxWidth: '70%',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-  },
-  theirMessage: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'white',
-    color: '#333',
-    padding: '1rem 1.5rem',
-    borderRadius: '20px 20px 20px 0',
-    maxWidth: '70%',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
-  },
-  time: {
-    fontSize: '0.7rem',
-    opacity: 0.8,
-    display: 'block',
-    marginTop: '0.5rem',
-    textAlign: 'right',
-  },
-  securityNote: {
-    fontSize: '0.8rem',
-    color: '#e65100',
-    backgroundColor: '#fff3e0',
-    padding: '0.5rem 1rem',
-    borderRadius: '20px',
-  },
-  emptyState: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: '#888',
-  }
 };
 
 export default Chat;
