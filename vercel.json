@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "shieldher-backend/server.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "shieldher-frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "shieldher-frontend/dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "shieldher-backend/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "shieldher-frontend/dist/index.html"
+    }
+  ]
+}
