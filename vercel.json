@@ -9,7 +9,7 @@
       "src": "shieldher-frontend/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "shieldher-frontend/dist"
+        "distDir": "dist"
       }
     }
   ],
@@ -20,7 +20,15 @@
     },
     {
       "src": "/(.*)",
-      "dest": "shieldher-frontend/dist/index.html"
+      "dest": "shieldher-frontend/$1",
+      "continue": true
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "shieldher-frontend/index.html"
     }
   ]
 }
