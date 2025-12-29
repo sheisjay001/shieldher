@@ -1,0 +1,42 @@
+.mobile-nav {
+    display: none; /* Hidden on desktop by default */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--surface-color);
+    border-top: 1px solid var(--border-color);
+    justify-content: space-around;
+    padding: 10px 0;
+    z-index: 1000;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.nav-item.active {
+    color: var(--primary-color);
+}
+
+.nav-item .icon {
+    font-size: 1.5rem;
+    margin-bottom: 2px;
+}
+
+/* Show only on mobile screens */
+@media (max-width: 768px) {
+    .mobile-nav {
+        display: flex;
+    }
+    
+    /* Add padding to body so content isn't hidden behind nav */
+    body {
+        padding-bottom: 60px;
+    }
+}

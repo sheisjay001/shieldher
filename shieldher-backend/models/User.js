@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema({
     type: String, // Path to uploaded ID/Selfie
     default: null
   },
+  profilePicture: {
+    type: String, // Path to uploaded profile picture
+    default: null
+  },
   inviteCode: {
     type: String, // If used invite code
     default: null

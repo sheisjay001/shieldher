@@ -49,6 +49,23 @@ const Community = () => {
     }
   };
 
+  const handleReport = async (postId) => {
+    const reason = prompt("Please provide a reason for reporting this post:");
+    if (!reason) return;
+
+    try {
+      await axios.post('http://localhost:5001/api/reports', {
+        reporter: user.id,
+        reportedTarget: postId,
+        targetType: 'Post',
+        reason
+      });
+      alert("Report submitted successfully. Thank you for keeping the community safe.");
+    } catch (err) {
+      alert("Failed to submit report.");
+    }
+  };
+
   return (
     <div className="community-container">
       <div className="community-header">
@@ -91,6 +108,13 @@ const Community = () => {
                 onClick={() => handleLike(post._id)}
               >
                 ❤️ {post.likes.length}
+              </button>
+              <button 
+                className="report-button"
+                onClick={() => handleReport(post._id)}
+                title="Report this post"
+              >
+                ⚠️ Report
               </button>
             </div>
           </div>

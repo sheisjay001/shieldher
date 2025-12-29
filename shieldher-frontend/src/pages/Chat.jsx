@@ -145,6 +145,23 @@ const Chat = () => {
     setReceiverId(null);
   };
 
+  const handleReportUser = async () => {
+    const reason = prompt(`Please provide a reason for reporting this user:`);
+    if (!reason) return;
+
+    try {
+      await axios.post('http://localhost:5001/api/reports', {
+        reporter: user.id,
+        reportedTarget: receiverId,
+        targetType: 'User',
+        reason
+      });
+      alert("User reported successfully. Admins will review the case.");
+    } catch (err) {
+      alert("Failed to submit report.");
+    }
+  };
+
   return (
     <div className="chat-container">
       <div className={`sidebar ${receiverId ? 'hidden' : ''}`}>
@@ -186,6 +203,7 @@ const Chat = () => {
                   </button>
                   <h3>{users.find(u => u._id === receiverId)?.username}</h3>
                   {isUserOnline(receiverId) && <span className="online-badge">Online</span>}
+                  <button onClick={handleReportUser} className="report-icon-btn" title="Report User">⚠️</button>
                </div>
                <div className="security-note">
                 <span title="AI Content Moderation Active">🛡️ ShieldAI Active</span>

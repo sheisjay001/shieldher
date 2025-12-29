@@ -148,3 +148,20 @@
 .like-button.liked {
     color: #e91e63;
 }
+
+.report-button {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-left: auto;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.report-button:hover {
+    background-color: rgba(244, 67, 54, 0.1);
+    color: #ef5350;
+}

@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import Navbar from './components/Navbar';
+import MobileNav from './components/MobileNav';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Chat from './pages/Chat';
@@ -41,6 +42,7 @@ function App() {
             </ProtectedRoute>
           } />
         </Routes>
+        <MobileNav />
       </Router>
     </AuthProvider>
   );
