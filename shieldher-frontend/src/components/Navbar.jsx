@@ -14,6 +14,7 @@ const Navbar = () => {
     logout();
     navigate('/login');
   };
+  const API_BASE = import.meta.env.VITE_API_URL || '';
 
   return (
     <>
@@ -34,7 +35,7 @@ const Navbar = () => {
             
             <div onClick={() => setShowProfile(true)} style={styles.profileContainer}>
                 {user.profilePicture ? (
-                    <img src={`http://localhost:5001/${user.profilePicture}`} style={styles.avatarSmall} alt="Profile" />
+                    <img src={`${API_BASE}/${user.profilePicture}`} style={styles.avatarSmall} alt="Profile" />
                 ) : (
                     <span style={styles.welcome}>Hello, {user.username}</span>
                 )}

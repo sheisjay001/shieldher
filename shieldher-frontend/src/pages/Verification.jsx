@@ -4,6 +4,7 @@ import axios from 'axios';
 import './Verification.css';
 
 const Verification = () => {
+  const API_BASE = import.meta.env.VITE_API_URL || '';
   const { user } = useContext(AuthContext);
   const [inviteCode, setInviteCode] = useState('');
   const [file, setFile] = useState(null);
@@ -13,7 +14,7 @@ const Verification = () => {
   const handleInviteSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`http://localhost:5001/api/verification/invite/${user.id}`, { inviteCode });
+      const res = await axios.post(`${API_BASE}/api/verification/invite/${user.id}`, { inviteCode });
       setMessage("Verification Successful! You are now a verified member.");
       setError('');
       
@@ -42,7 +43,7 @@ const Verification = () => {
     formData.append('idImage', file);
 
     try {
-      const res = await axios.post(`http://localhost:5001/api/verification/upload-id/${user.id}`, formData, {
+      const res = await axios.post(`${API_BASE}/api/verification/upload-id/${user.id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

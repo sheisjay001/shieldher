@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import io from 'socket.io-client';
 import axios from 'axios';
 import './Chat.css';
 
 const Chat = () => {
+  const API_BASE = import.meta.env.VITE_API_URL || '';
+  const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || window.location.origin;
   const { user } = useContext(AuthContext);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -19,7 +21,7 @@ const Chat = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get('http://localhost:5001/api/users');
+        const res = await axios.get(`${API_BASE}/api/users`);
         // Filter out current user
         setUsers(res.data.filter(u => u._id !== user.id));
       } catch (err) {
@@ -27,7 +29,7 @@ const Chat = () => {
       }
     };
     fetchUsers();
-  }, [user]);
+  }, [user, API_BASE]);
 
   // Fetch message history when receiver changes
   useEffect(() => {
@@ -35,18 +37,25 @@ const Chat = () => {
 
     const fetchMessages = async () => {
       try {
-        const res = await axios.get(`http://localhost:5001/api/messages/${user.id}/${receiverId}`);
+        const res = await axios.get(`${API_BASE}/api/messages/${user.id}/${receiverId}`);
         setMessages(res.data);
       } catch (err) {
         console.error("Error fetching messages:", err);
       }
     };
     fetchMessages();
-    setIsTyping(false); // Reset typing indicator when switching users
-  }, [receiverId, user.id]);
+  }, [receiverId, user.id, API_BASE]);
+
+  const markAsRead = async (messageId) => {
+    try {
+      await axios.put(`${API_BASE}/api/messages/${messageId}/read`);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
-    socket.current = io('http://localhost:5001');
+    socket.current = io(SOCKET_URL);
     socket.current.emit('join_room', user.id);
 
     // Listen for online users update
@@ -81,7 +90,7 @@ const Chat = () => {
     return () => {
       socket.current.disconnect();
     };
-  }, [user, receiverId]);
+  }, [user, receiverId, SOCKET_URL, markAsRead]);
 
   const handleTyping = (e) => {
     setNewMessage(e.target.value);
@@ -115,7 +124,7 @@ const Chat = () => {
     };
 
     try {
-      const res = await axios.post('http://localhost:5001/api/messages', messageData);
+      const res = await axios.post(`${API_BASE}/api/messages`, messageData);
       setMessages((prev) => [...prev, res.data]);
       socket.current.emit('send_message', res.data);
       setNewMessage('');
@@ -129,13 +138,7 @@ const Chat = () => {
     }
   };
 
-  const markAsRead = async (messageId) => {
-    try {
-      await axios.put(`http://localhost:5001/api/messages/${messageId}/read`);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  
 
   const isUserOnline = (userId) => {
     return onlineUsers.includes(userId);
@@ -150,7 +153,7 @@ const Chat = () => {
     if (!reason) return;
 
     try {
-      await axios.post('http://localhost:5001/api/reports', {
+      await axios.post(`${API_BASE}/api/reports`, {
         reporter: user.id,
         reportedTarget: receiverId,
         targetType: 'User',
@@ -158,6 +161,7 @@ const Chat = () => {
       });
       alert("User reported successfully. Admins will review the case.");
     } catch (err) {
+      console.error(err);
       alert("Failed to submit report.");
     }
   };

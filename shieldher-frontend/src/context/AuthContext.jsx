@@ -4,26 +4,20 @@ import axios from 'axios';
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const API_BASE = import.meta.env.VITE_API_URL || '';
+  const [user, setUser] = useState(() => {
+    const userData = localStorage.getItem('user');
+    return userData ? JSON.parse(userData) : null;
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    if (token && userData) {
-      // Re-fetch user to get latest verification status
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
-      // Optional: fetch latest user data from API here to sync verification status
-      // For now we rely on login or manual reload, but let's try to update if possible
-      // This part is skipped to keep it simple, but user needs to relogin or reload to see verification update
-    }
     setLoading(false);
   }, []);
 
   const login = async (email, password) => {
     try {
-      const res = await axios.post('http://localhost:5001/api/auth/login', { email, password });
+      const res = await axios.post(`${API_BASE}/api/auth/login`, { email, password });
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       setUser(res.data.user);
@@ -35,7 +29,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (username, email, password) => {
     try {
-      await axios.post('http://localhost:5001/api/auth/register', { username, email, password });
+      await axios.post(`${API_BASE}/api/auth/register`, { username, email, password });
       return { success: true };
     } catch (err) {
       return { success: false, error: err.response?.data?.error || 'Registration failed' };

@@ -4,30 +4,31 @@ import axios from 'axios';
 import './Community.css';
 
 const Community = () => {
+  const API_BASE = import.meta.env.VITE_API_URL || '';
   const { user } = useContext(AuthContext);
   const [posts, setPosts] = useState([]);
   const [newPostContent, setNewPostContent] = useState('');
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
   const fetchPosts = async () => {
     try {
-      const res = await axios.get('http://localhost:5001/api/posts');
+      const res = await axios.get(`${API_BASE}/api/posts`);
       setPosts(res.data);
     } catch (err) {
       console.error(err);
     }
   };
 
+  useEffect(() => {
+    fetchPosts();
+  }, [API_BASE]);
+
   const handleCreatePost = async (e) => {
     e.preventDefault();
     if (!newPostContent.trim()) return;
 
     try {
-      const res = await axios.post('http://localhost:5001/api/posts', {
+      const res = await axios.post(`${API_BASE}/api/posts`, {
         author: user.id,
         content: newPostContent
       });
@@ -41,7 +42,7 @@ const Community = () => {
 
   const handleLike = async (postId) => {
     try {
-      const res = await axios.put(`http://localhost:5001/api/posts/${postId}/like`, { userId: user.id });
+      const res = await axios.put(`${API_BASE}/api/posts/${postId}/like`, { userId: user.id });
       // Update local state
       setPosts(posts.map(p => p._id === postId ? { ...p, likes: res.data.likes } : p));
     } catch (err) {
@@ -54,7 +55,7 @@ const Community = () => {
     if (!reason) return;
 
     try {
-      await axios.post('http://localhost:5001/api/reports', {
+      await axios.post(`${API_BASE}/api/reports`, {
         reporter: user.id,
         reportedTarget: postId,
         targetType: 'Post',
@@ -62,6 +63,7 @@ const Community = () => {
       });
       alert("Report submitted successfully. Thank you for keeping the community safe.");
     } catch (err) {
+      console.error(err);
       alert("Failed to submit report.");
     }
   };

@@ -4,6 +4,7 @@ import axios from 'axios';
 import './Profile.css';
 
 const Profile = ({ onClose }) => {
+  const API_BASE = import.meta.env.VITE_API_URL || '';
   const { user } = useContext(AuthContext);
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
@@ -20,7 +21,7 @@ const Profile = ({ onClose }) => {
     formData.append('avatar', file);
 
     try {
-      const res = await axios.post(`http://localhost:5001/api/users/${user.id}/avatar`, formData, {
+      const res = await axios.post(`${API_BASE}/api/users/${user.id}/avatar`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setMessage("Profile picture updated!");
