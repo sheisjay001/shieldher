@@ -11,6 +11,11 @@
   --message-received: #1e1e1e;
   --online-color: #00e676;
   --primary-hover: #4a148c;
+  --input-background: #2c2c2c;
+  --surface-hover: #1e1e1e;
+  --bg-color: var(--background-color);
+  --bg-primary: var(--background-color);
+  --bg-secondary: var(--surface-color);
 }
 
 body.light-mode {
@@ -25,6 +30,11 @@ body.light-mode {
   --message-received: #f5f5f5;
   --online-color: #2e7d32;
   --primary-hover: #7b1fa2;
+  --input-background: #ffffff;
+  --surface-hover: #f5f5f5;
+  --bg-color: var(--background-color);
+  --bg-primary: var(--background-color);
+  --bg-secondary: var(--surface-color);
 }
 
 body {

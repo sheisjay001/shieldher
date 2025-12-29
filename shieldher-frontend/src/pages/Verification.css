@@ -50,7 +50,7 @@
     width: 100%;
     padding: 12px;
     margin-bottom: 10px;
-    background-color: var(--surface-hover);
+    background-color: var(--input-background);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     color: var(--text-primary);
