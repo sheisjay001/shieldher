@@ -91,3 +91,20 @@
     margin-top: 1rem;
     color: var(--online-color);
 }
+
+.logout-btn-modal {
+    margin-top: 1.5rem;
+    background-color: transparent;
+    border: 1px solid #ff5252;
+    color: #ff5252;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.logout-btn-modal:hover {
+    background-color: rgba(255, 82, 82, 0.1);
+}

@@ -1,16 +1,24 @@
 import React, { useContext, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Profile.css';
 
 const Profile = ({ onClose }) => {
   const API_BASE = import.meta.env.VITE_API_URL || '';
-  const { user } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
+  };
+
+  const handleLogout = () => {
+    logout();
+    onClose();
+    navigate('/login');
   };
 
   const handleUpload = async (e) => {
@@ -46,7 +54,7 @@ const Profile = ({ onClose }) => {
         
         <div className="current-avatar">
           {user.profilePicture ? (
-            <img src={`http://localhost:5001/${user.profilePicture}`} alt="Profile" className="profile-img-large" />
+            <img src={`${API_BASE}/${user.profilePicture}`} alt="Profile" className="profile-img-large" />
           ) : (
             <div className="avatar-placeholder-large">{user.username.charAt(0).toUpperCase()}</div>
           )}
@@ -60,6 +68,8 @@ const Profile = ({ onClose }) => {
             <button type="submit" className="save-btn" disabled={!file}>Save Changes</button>
         </form>
         {message && <p className="message">{message}</p>}
+        
+        <button onClick={handleLogout} className="logout-btn-modal">Logout</button>
       </div>
     </div>
   );

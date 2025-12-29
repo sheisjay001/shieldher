@@ -14,6 +14,7 @@ const Chat = () => {
   const [users, setUsers] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]); // Store IDs of online users
   const [isTyping, setIsTyping] = useState(false); // State for displaying typing indicator
+  const [showChat, setShowChat] = useState(false); // Mobile view toggle
   const socket = useRef();
   const typingTimeoutRef = useRef(null);
 
@@ -98,156 +99,113 @@ const Chat = () => {
     if (!receiverId) return;
 
     // Emit typing event
-    socket.current.emit('typing', { receiverId, senderId: user.id });
+    socket.current.emit('typing', { senderId: user.id, receiverId });
 
-    // Clear existing timeout
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
 
-    // Set timeout to stop typing after 2 seconds of inactivity
     typingTimeoutRef.current = setTimeout(() => {
-      socket.current.emit('stop_typing', { receiverId, senderId: user.id });
-    }, 2000);
+      socket.current.emit('stop_typing', { senderId: user.id, receiverId });
+    }, 1000);
   };
 
-  const sendMessage = async () => {
-    if (!newMessage || !receiverId) return;
-
-    // Clear typing timeout and emit stop_typing immediately
-    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-    socket.current.emit('stop_typing', { receiverId, senderId: user.id });
+  const sendMessage = async (e) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !receiverId) return;
 
     const messageData = {
       sender: user.id,
       receiver: receiverId,
       content: newMessage,
-      createdAt: new Date(),
     };
 
     try {
       const res = await axios.post(`${API_BASE}/api/messages`, messageData);
-      setMessages((prev) => [...prev, res.data]);
       socket.current.emit('send_message', res.data);
+      setMessages([...messages, res.data]);
       setNewMessage('');
+      socket.current.emit('stop_typing', { senderId: user.id, receiverId });
     } catch (err) {
       console.error(err);
-      if (err.response && err.response.data && err.response.data.error) {
-        alert(err.response.data.error);
-      } else {
-        alert("Failed to send message.");
-      }
     }
   };
 
-  
-
-  const isUserOnline = (userId) => {
-    return onlineUsers.includes(userId);
+  const handleUserSelect = (id) => {
+    setReceiverId(id);
+    setShowChat(true);
   };
 
   const handleBackToUsers = () => {
+    setShowChat(false);
     setReceiverId(null);
   };
 
-  const handleReportUser = async () => {
-    const reason = prompt(`Please provide a reason for reporting this user:`);
-    if (!reason) return;
-
-    try {
-      await axios.post(`${API_BASE}/api/reports`, {
-        reporter: user.id,
-        reportedTarget: receiverId,
-        targetType: 'User',
-        reason
-      });
-      alert("User reported successfully. Admins will review the case.");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to submit report.");
-    }
-  };
-
   return (
-    <div className="chat-container">
-      <div className={`sidebar ${receiverId ? 'hidden' : ''}`}>
+    <div className={`chat-container ${showChat ? 'chat-active' : ''}`}>
+      <div className="sidebar">
         <div className="sidebar-header">
-          <h3>Conversations</h3>
+          <h3>Messages</h3>
         </div>
         <div className="user-list">
           {users.map((u) => (
-            <div 
-              key={u._id} 
-              onClick={() => setReceiverId(u._id)}
+            <div
+              key={u._id}
               className={`user-item ${receiverId === u._id ? 'active' : ''}`}
+              onClick={() => handleUserSelect(u._id)}
             >
               <div className="avatar-container">
-                 <div className="avatar">{u.username.charAt(0).toUpperCase()}</div>
-                 {isUserOnline(u._id) && <div className="online-indicator"></div>}
+                {u.profilePicture ? (
+                    <img src={`${API_BASE}/${u.profilePicture}`} className="avatar" alt="User" />
+                ) : (
+                    <div className="avatar">{u.username.charAt(0).toUpperCase()}</div>
+                )}
+                {onlineUsers.includes(u._id) && <div className="online-indicator"></div>}
               </div>
               <div className="user-info">
                 <span className="username">{u.username}</span>
-                <span className={`status-text ${isUserOnline(u._id) ? 'online' : ''}`}>
-                  {isUserOnline(u._id) ? 'Online' : 'Offline'}
-                </span>
+                <span className="status-text">{onlineUsers.includes(u._id) ? 'Online' : 'Offline'}</span>
               </div>
             </div>
           ))}
         </div>
       </div>
-      
-      {/* On mobile, if no receiver selected, we show sidebar only (handled by CSS hiding chat-area or showing empty state differently) */}
-      {/* Actually, with the 'hidden' class on sidebar, we just need to make sure chat-area takes full width */}
-      
-      <div className="chat-area" style={{ display: !receiverId && window.innerWidth <= 768 ? 'none' : 'flex' }}>
+
+      <div className="chat-window">
         {receiverId ? (
           <>
             <div className="chat-header">
-               <div className="header-info">
-                  <button className="back-button" onClick={handleBackToUsers}>
-                    ←
-                  </button>
-                  <h3>{users.find(u => u._id === receiverId)?.username}</h3>
-                  {isUserOnline(receiverId) && <span className="online-badge">Online</span>}
-                  <button onClick={handleReportUser} className="report-icon-btn" title="Report User">⚠️</button>
-               </div>
-               <div className="security-note">
-                <span title="AI Content Moderation Active">🛡️ ShieldAI Active</span>
-                <span style={{marginLeft: '10px'}}>🔒 Auto-delete (5m)</span>
+              <button className="back-btn" onClick={handleBackToUsers}>←</button>
+              <div className="chat-header-user">
+                {users.find(u => u._id === receiverId)?.profilePicture ? (
+                   <img src={`${API_BASE}/${users.find(u => u._id === receiverId)?.profilePicture}`} className="avatar-small" alt="User" />
+                ) : (
+                   <div className="avatar-small">{users.find(u => u._id === receiverId)?.username.charAt(0).toUpperCase()}</div>
+                )}
+                <h4>{users.find(u => u._id === receiverId)?.username}</h4>
               </div>
             </div>
-            
-            <div className="messages-list">
+            <div className="messages-container">
               {messages.map((msg, index) => (
-                <div 
-                  key={index} 
-                  className={`message-bubble ${msg.sender === user.id ? 'mine' : 'theirs'}`}
-                >
-                  <div className="message-content">{msg.content}</div>
-                  <span className="message-time">{new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                <div key={index} className={`message ${msg.sender === user.id ? 'sent' : 'received'}`}>
+                  <p>{msg.content}</p>
+                  <span className="timestamp">{new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                 </div>
               ))}
-              {isTyping && (
-                <div className="typing-indicator">
-                  <span>User is typing...</span>
-                </div>
-              )}
+              {isTyping && <div className="typing-indicator">Typing...</div>}
             </div>
-            <div className="input-area">
+            <form onSubmit={sendMessage} className="message-input-form">
               <input
                 type="text"
                 placeholder="Type a message..."
                 value={newMessage}
                 onChange={handleTyping}
                 className="message-input"
-                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
               />
-              <button onClick={sendMessage} className="send-button">➤</button>
-            </div>
+              <button type="submit" className="send-button">Send</button>
+            </form>
           </>
         ) : (
-          <div className="empty-state">
-            <div className="empty-icon">💬</div>
+          <div className="no-chat-selected">
             <h3>Select a user to start chatting</h3>
-            <p>Choose from the list on the left</p>
           </div>
         )}
       </div>

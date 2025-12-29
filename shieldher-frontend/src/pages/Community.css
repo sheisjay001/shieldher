@@ -99,69 +99,19 @@
     font-weight: bold;
 }
 
-.post-meta {
-    display: flex;
-    flex-direction: column;
-}
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    .community-container {
+        padding: 10px;
+    }
 
-.post-author {
-    font-weight: 600;
-    color: var(--text-primary);
-}
+    .create-post-card, .post-card {
+        padding: 1rem;
+    }
 
-.post-date {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-}
-
-.post-content {
-    margin-bottom: 1rem;
-    line-height: 1.5;
-    white-space: pre-wrap;
-}
-
-.post-footer {
-    display: flex;
-    align-items: center;
-    border-top: 1px solid var(--border-color);
-    padding-top: 10px;
-}
-
-.like-button {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 10px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-}
-
-.like-button:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-}
-
-.like-button.liked {
-    color: #e91e63;
-}
-
-.report-button {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    font-size: 0.9rem;
-    margin-left: auto;
-    padding: 5px 10px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-}
-
-.report-button:hover {
-    background-color: rgba(244, 67, 54, 0.1);
-    color: #ef5350;
+    .avatar.small {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+    }
 }

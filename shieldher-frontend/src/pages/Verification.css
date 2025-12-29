@@ -103,8 +103,7 @@
     font-size: 0.9rem;
 }
 
-.divider::before,
-.divider::after {
+.divider::before, .divider::after {
     content: "";
     flex: 1;
     border-bottom: 1px solid var(--border-color);
@@ -118,20 +117,13 @@
     margin-left: 10px;
 }
 
-.success-message {
-    background-color: rgba(0, 230, 118, 0.1);
-    color: var(--online-color);
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    border: 1px solid var(--online-color);
-}
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+    .verification-card {
+        padding: 1.5rem;
+    }
 
-.error-message {
-    background-color: rgba(244, 67, 54, 0.1);
-    color: #ef5350;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    border: 1px solid #ef5350;
+    .verification-card h2 {
+        font-size: 1.5rem;
+    }
 }
