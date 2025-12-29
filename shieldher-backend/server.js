@@ -8,6 +8,8 @@ require('dotenv').config();
 const authRoutes = require('./routes/authRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const userRoutes = require('./routes/userRoutes');
+const verificationRoutes = require('./routes/verificationRoutes');
+const postRoutes = require('./routes/postRoutes');
 
 const app = express();
 const server = http.createServer(app);
@@ -31,6 +33,11 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/shieldher')
 app.use('/api/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/verification', verificationRoutes);
+app.use('/api/posts', postRoutes);
+
+// Make uploads folder public
+app.use('/uploads', express.static('uploads'));
 
 // Online Users Storage
 let onlineUsers = [];

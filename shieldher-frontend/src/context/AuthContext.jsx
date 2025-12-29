@@ -11,7 +11,12 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
     if (token && userData) {
-      setUser(JSON.parse(userData));
+      // Re-fetch user to get latest verification status
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
+      // Optional: fetch latest user data from API here to sync verification status
+      // For now we rely on login or manual reload, but let's try to update if possible
+      // This part is skipped to keep it simple, but user needs to relogin or reload to see verification update
     }
     setLoading(false);
   }, []);

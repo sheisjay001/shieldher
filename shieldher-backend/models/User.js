@@ -20,6 +20,19 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false // Requires admin or AI verification
   },
+  verificationStatus: {
+    type: String,
+    enum: ['unverified', 'pending', 'verified', 'rejected'],
+    default: 'unverified'
+  },
+  verificationImage: {
+    type: String, // Path to uploaded ID/Selfie
+    default: null
+  },
+  inviteCode: {
+    type: String, // If used invite code
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now

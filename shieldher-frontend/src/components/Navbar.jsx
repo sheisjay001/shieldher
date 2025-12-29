@@ -19,6 +19,9 @@ const Navbar = () => {
       <div style={styles.links}>
         {user ? (
           <>
+            <Link to="/" style={styles.link}>Chat</Link>
+            <Link to="/community" style={styles.link}>Community</Link>
+            {!user.isVerified && <Link to="/verification" style={styles.verifyLink}>Verify Now</Link>}
             <span style={styles.welcome}>Hello, {user.username}</span>
             <button onClick={handleLogout} style={styles.button}>Logout</button>
           </>
@@ -55,6 +58,14 @@ const styles = {
     color: 'white',
     textDecoration: 'none',
     fontWeight: '500',
+  },
+  verifyLink: {
+    color: '#00e676',
+    textDecoration: 'none',
+    fontWeight: 'bold',
+    border: '1px solid #00e676',
+    padding: '4px 8px',
+    borderRadius: '4px',
   },
   button: {
     padding: '0.5rem 1rem',
