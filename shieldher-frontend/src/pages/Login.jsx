@@ -14,7 +14,11 @@ const Login = () => {
     e.preventDefault();
     const res = await login(email, password);
     if (res.success) {
-      navigate('/community');
+      if (res.data && res.data.user && res.data.user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/community');
+      }
     } else {
       setError(res.error);
     }

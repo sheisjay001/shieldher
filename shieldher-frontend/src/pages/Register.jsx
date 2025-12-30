@@ -15,7 +15,11 @@ const Register = () => {
     e.preventDefault();
     const res = await register(username, email, password);
     if (res.success) {
-      navigate('/community');
+      if (res.data && res.data.user && res.data.user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/community');
+      }
     } else {
       setError(res.error);
     }

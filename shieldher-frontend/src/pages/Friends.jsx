@@ -13,7 +13,7 @@ const Friends = () => {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  const API_BASE = import.meta.env.VITE_API_URL || '';
 
   useEffect(() => {
     if (activeTab === 'requests') fetchRequests();

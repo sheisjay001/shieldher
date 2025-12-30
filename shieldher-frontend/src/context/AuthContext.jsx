@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       setUser(res.data.user);
-      return { success: true };
+      return { success: true, data: res.data };
     } catch (err) {
       console.error("Login Error:", err);
       return { success: false, error: err.response?.data?.error || err.message || 'Login failed' };
@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('user', JSON.stringify(res.data.user));
       setUser(res.data.user);
 
-      return { success: true };
+      return { success: true, data: res.data };
     } catch (err) {
       console.error("Registration Error:", err);
       return { success: false, error: err.response?.data?.error || err.message || 'Registration failed' };
