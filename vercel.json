@@ -23,7 +23,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "shieldher-frontend/index.html"
+      "dest": "shieldher-frontend/dist/index.html"
     }
   ]
 }
