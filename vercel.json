@@ -6,7 +6,7 @@
       "use": "@vercel/node"
     },
     {
-      "src": "shieldher-frontend/package.json",
+      "src": "shieldher-frontend",
       "use": "@vercel/static-build",
       "config": {
         "distDir": "dist"
