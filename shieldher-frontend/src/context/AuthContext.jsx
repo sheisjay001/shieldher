@@ -15,6 +15,17 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
+  const toErrorString = (err) => {
+    const e = err?.response?.data?.error ?? err?.message ?? err;
+    if (typeof e === 'string') return e;
+    if (e?.message && typeof e.message === 'string') return e.message;
+    try {
+      return JSON.stringify(e);
+    } catch {
+      return 'Unexpected error';
+    }
+  };
+
   const login = async (email, password) => {
     try {
       const res = await axios.post(`${API_BASE}/api/auth/login`, { email, password });
@@ -30,7 +41,7 @@ export const AuthProvider = ({ children }) => {
       return { success: true, data: res.data };
     } catch (err) {
       console.error("Login Error:", err);
-      return { success: false, error: err.response?.data?.error || err.message || 'Login failed' };
+      return { success: false, error: toErrorString(err) };
     }
   };
 
@@ -50,7 +61,7 @@ export const AuthProvider = ({ children }) => {
       return { success: true, data: res.data };
     } catch (err) {
       console.error("Registration Error:", err);
-      return { success: false, error: err.response?.data?.error || err.message || 'Registration failed' };
+      return { success: false, error: toErrorString(err) };
     }
   };
 

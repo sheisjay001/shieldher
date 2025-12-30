@@ -14,6 +14,17 @@ const Friends = () => {
   const [loading, setLoading] = useState(false);
 
   const API_BASE = import.meta.env.VITE_API_URL || '';
+  
+  const toErrorString = (err) => {
+    const e = err?.response?.data?.error ?? err?.message ?? err;
+    if (typeof e === 'string') return e;
+    if (e?.message && typeof e.message === 'string') return e.message;
+    try {
+      return JSON.stringify(e);
+    } catch {
+      return 'Unexpected error';
+    }
+  };
 
   useEffect(() => {
     if (activeTab === 'requests') fetchRequests();
@@ -71,7 +82,7 @@ const Friends = () => {
       // Remove from search results to avoid duplicate sending
       setSearchResults(prev => prev.filter(u => u.id !== receiverId));
     } catch (err) {
-      setMessage(err.response?.data?.error || 'Error sending request');
+      setMessage(toErrorString(err));
       setTimeout(() => setMessage(''), 3000);
     }
   };

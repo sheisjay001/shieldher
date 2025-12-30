@@ -10,6 +10,17 @@ const Verification = () => {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  
+  const toErrorString = (err) => {
+    const e = err?.response?.data?.error ?? err?.message ?? err;
+    if (typeof e === 'string') return e;
+    if (e?.message && typeof e.message === 'string') return e.message;
+    try {
+      return JSON.stringify(e);
+    } catch {
+      return 'Unexpected error';
+    }
+  };
 
   const handleInviteSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +37,7 @@ const Verification = () => {
         window.location.reload(); 
       }, 1500);
     } catch (err) {
-      setError(err.response?.data?.error || "Invalid invite code");
+      setError(toErrorString(err));
       setMessage('');
     }
   };
@@ -51,7 +62,7 @@ const Verification = () => {
       setMessage(res.data.message);
       setError('');
     } catch (err) {
-      setError(err.response?.data?.error || "Upload failed");
+      setError(toErrorString(err));
       setMessage('');
     }
   };

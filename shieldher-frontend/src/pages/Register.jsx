@@ -10,6 +10,12 @@ const Register = () => {
   const [error, setError] = useState('');
   const { register } = useContext(AuthContext);
   const navigate = useNavigate();
+  
+  const toErrorString = (err) => {
+    const e = typeof err === 'string' ? err : err?.message ?? err;
+    if (typeof e === 'string') return e;
+    try { return JSON.stringify(e); } catch { return 'Unexpected error'; }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,7 +27,7 @@ const Register = () => {
         navigate('/community');
       }
     } else {
-      setError(res.error);
+      setError(toErrorString(res.error));
     }
   };
 

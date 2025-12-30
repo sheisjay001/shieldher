@@ -10,6 +10,17 @@ const Community = () => {
   const [newPostContent, setNewPostContent] = useState('');
   const [mediaFile, setMediaFile] = useState(null);
   const [error, setError] = useState('');
+  
+  const toErrorString = (err) => {
+    const e = err?.response?.data?.error ?? err?.message ?? err;
+    if (typeof e === 'string') return e;
+    if (e?.message && typeof e.message === 'string') return e.message;
+    try {
+      return JSON.stringify(e);
+    } catch {
+      return 'Unexpected error';
+    }
+  };
 
   const fetchPosts = async () => {
     try {
@@ -46,7 +57,7 @@ const Community = () => {
       setMediaFile(null);
       setError('');
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to create post");
+      setError(toErrorString(err));
     }
   };
 
