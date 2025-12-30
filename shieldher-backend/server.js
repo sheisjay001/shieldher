@@ -16,13 +16,19 @@ const friendRoutes = require('./routes/friendRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: "*", // Allow all origins for development/demo
-    methods: ["GET", "POST"]
-  }
-});
+const isVercel = !!process.env.VERCEL;
+let server;
+let io;
+
+if (!isVercel) {
+  server = http.createServer(app);
+  io = new Server(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"]
+    }
+  });
+}
 
 // Middleware
 app.use(cors({
@@ -68,45 +74,45 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 let onlineUsers = [];
 
 // Socket.io for Real-time Messaging
-io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
+if (!isVercel && io) {
+  io.on('connection', (socket) => {
+    console.log('User connected:', socket.id);
 
-  socket.on('join_room', (userId) => {
-    socket.join(userId);
-    
-    // Add user to online list if not already present
-    if (!onlineUsers.some((user) => user.userId === userId)) {
-      onlineUsers.push({ userId, socketId: socket.id });
-    }
-    
-    // Broadcast updated online users list
-    io.emit('get_online_users', onlineUsers);
-    
-    console.log(`User with ID: ${userId} joined room: ${userId}`);
+    socket.on('join_room', (userId) => {
+      socket.join(userId);
+      
+      if (!onlineUsers.some((user) => user.userId === userId)) {
+        onlineUsers.push({ userId, socketId: socket.id });
+      }
+      
+      io.emit('get_online_users', onlineUsers);
+      
+      console.log(`User with ID: ${userId} joined room: ${userId}`);
+    });
+
+    socket.on('send_message', (data) => {
+      socket.to(data.receiver).emit('receive_message', data);
+    });
+
+    socket.on('typing', (data) => {
+      socket.to(data.receiverId).emit('display_typing', { senderId: data.senderId });
+    });
+
+    socket.on('stop_typing', (data) => {
+      socket.to(data.receiverId).emit('hide_typing', { senderId: data.senderId });
+    });
+
+    socket.on('disconnect', () => {
+      console.log('User disconnected', socket.id);
+      onlineUsers = onlineUsers.filter((user) => user.socketId !== socket.id);
+      io.emit('get_online_users', onlineUsers);
+    });
   });
+}
 
-  socket.on('send_message', (data) => {
-    // data should contain { receiverId, messageContent, ... }
-    socket.to(data.receiver).emit('receive_message', data);
-  });
-
-  // Typing Indicators
-  socket.on('typing', (data) => {
-    // data: { receiverId, senderId }
-    socket.to(data.receiverId).emit('display_typing', { senderId: data.senderId });
-  });
-
-  socket.on('stop_typing', (data) => {
-    socket.to(data.receiverId).emit('hide_typing', { senderId: data.senderId });
-  });
-
-  socket.on('disconnect', () => {
-    console.log('User disconnected', socket.id);
-    // Remove user from online list
-    onlineUsers = onlineUsers.filter((user) => user.socketId !== socket.id);
-    io.emit('get_online_users', onlineUsers);
-  });
-});
-
-const PORT = process.env.PORT || 5001;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+if (isVercel) {
+  module.exports = app;
+} else {
+  const PORT = process.env.PORT || 5001;
+  server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
