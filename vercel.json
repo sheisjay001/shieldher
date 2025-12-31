@@ -11,10 +11,6 @@
       "config": {
         "distDir": "dist"
       }
-    },
-    {
-      "src": "shieldher-frontend/dist/**",
-      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -26,16 +22,8 @@
       "handle": "filesystem"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "shieldher-frontend/dist/assets/$1"
-    },
-    {
-      "src": "/(.*)\\.(js|css|ico|svg|png|jpg|jpeg|webp)",
-      "dest": "shieldher-frontend/dist/$1.$2"
-    },
-    {
       "src": "/(.*)",
-      "dest": "shieldher-frontend/dist/index.html"
+      "dest": "/index.html"
     }
   ]
 }
