@@ -23,7 +23,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "shieldher-backend/server.js"
     }
   ]
 }

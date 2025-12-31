@@ -71,11 +71,11 @@ app.use('/api/admin', adminRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Serve frontend build (for serverless deployment packaging)
-app.use(express.static(path.join(__dirname, 'shieldher-frontend/dist')));
+app.use(express.static(path.join(__dirname, '../shieldher-frontend/dist')));
 
 // SPA fallback for non-API routes
 app.get(/^\/(?!api).*/, (req, res) => {
-  res.sendFile(path.join(__dirname, 'shieldher-frontend/dist/index.html'));
+  res.sendFile(path.join(__dirname, '../shieldher-frontend/dist/index.html'));
 });
 
 // Online Users Storage
