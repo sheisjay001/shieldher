@@ -112,10 +112,12 @@ const Chat = () => {
     e.preventDefault();
     if (!newMessage.trim() || !receiverId) return;
 
+    const encryptedContent = encryptMessage(newMessage);
+
     const messageData = {
       sender: user.id,
       receiver: receiverId,
-      content: newMessage,
+      content: encryptedContent,
     };
 
     try {

@@ -1,27 +1,67 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 
 const SOSButton = () => {
   const [isActive, setIsActive] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSOS = () => {
+  const handleSOS = async () => {
     if (isActive) {
       setIsActive(false);
       toast.success('SOS Alert Cancelled');
       return;
     }
 
-    // In a real implementation, this would trigger an API call
-    toast.promise(
-      new Promise((resolve) => setTimeout(resolve, 2000)),
-      {
-        loading: 'Activating SOS...',
-        success: <b>SOS Alert Sent! Location shared with contacts.</b>,
-        error: <b>Failed to send alert.</b>,
-      }
-    );
-    setIsActive(true);
+    if (!navigator.geolocation) {
+      toast.error('Geolocation is not supported by your browser');
+      return;
+    }
+
+    setLoading(true);
+    
+    const sendAlert = (position) => {
+        const { latitude, longitude } = position.coords;
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            toast.error("Please login to use SOS");
+            setLoading(false);
+            return;
+        }
+
+        axios.post('/api/sos', 
+            { latitude, longitude },
+            { headers: { Authorization: `Bearer ${token}` } }
+        )
+        .then(() => {
+            setIsActive(true);
+            toast.success(<b>SOS Alert Sent! Help is on the way.</b>, { duration: 5000 });
+        })
+        .catch(err => {
+            console.error(err);
+            toast.error("Failed to send alert. Check connection.");
+        })
+        .finally(() => {
+            setLoading(false);
+        });
+    };
+
+    const handleError = () => {
+        toast.error("Unable to retrieve location. Sending alert without location...");
+        // Fallback: Send without coords
+        const token = localStorage.getItem('token');
+        axios.post('/api/sos', {}, { headers: { Authorization: `Bearer ${token}` } })
+            .then(() => {
+                setIsActive(true);
+                toast.success('SOS Alert Sent (No Location)');
+            })
+            .catch(() => toast.error('Failed to send alert'))
+            .finally(() => setLoading(false));
+    };
+
+    navigator.geolocation.getCurrentPosition(sendAlert, handleError);
   };
 
   return (
@@ -42,8 +82,9 @@ const SOSButton = () => {
             : '0 4px 14px rgba(239, 68, 68, 0.4)',
         }}
         onClick={handleSOS}
+        disabled={loading}
       >
-        {isActive ? 'CANCEL SOS' : 'SOS'}
+        {loading ? '...' : (isActive ? 'CANCEL SOS' : 'SOS')}
       </motion.button>
       
       {isActive && (
