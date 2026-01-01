@@ -8,7 +8,7 @@ const { Server } = require('socket.io');
 const { sequelize } = require('./models'); // Import sequelize from models/index.js
 require('dotenv').config();
 
-
+let dbError = null;
 
 const app = express();
 const isVercel = !!process.env.VERCEL;
