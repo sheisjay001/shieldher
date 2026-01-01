@@ -58,5 +58,6 @@ module.exports = {
   Comment,
   PostLike,
   Report,
-  FriendRequest
+  FriendRequest,
+  SOSAlert
 };

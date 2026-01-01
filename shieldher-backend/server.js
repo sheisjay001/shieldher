@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const http = require('http');
 const path = require('path');
 const { Server } = require('socket.io');
@@ -17,6 +19,21 @@ const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 const isVercel = !!process.env.VERCEL;
+
+// Security Middleware
+app.use(helmet({
+  contentSecurityPolicy: false, // Disable CSP for now to avoid frontend asset blocking
+}));
+
+// Rate Limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api', limiter);
+
 let server;
 let io;
 
@@ -24,7 +41,7 @@ if (!isVercel) {
   server = http.createServer(app);
   io = new Server(server, {
     cors: {
-      origin: "*",
+      origin: process.env.FRONTEND_URL || "*",
       methods: ["GET", "POST"]
     }
   });
@@ -32,7 +49,7 @@ if (!isVercel) {
 
 // Middleware
 app.use(cors({
-  origin: '*', // Be explicitly permissive
+  origin: process.env.FRONTEND_URL || '*', // Restrict this in production
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -66,6 +83,7 @@ app.use('/api/posts', postRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/friends', friendRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/sos', sosRoutes);
 
 // Make uploads folder public
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
