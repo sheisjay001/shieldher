@@ -66,18 +66,43 @@ app.use((req, res, next) => {
   next();
 });
 
-// Database Connection
-sequelize.authenticate()
-  .then(() => {
-    console.log('TiDB/MySQL Connected');
-    return sequelize.sync(); // Sync models with database
-  })
-  .then(() => {
-    console.log('Database Synced');
-  })
-  .catch(err => {
-    console.error('Database Connection Error:', err);
+// Health Check
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date(), 
+    dbStatus: dbError ? 'error' : (sequelize ? 'connected' : 'initializing'),
+    dbError: dbError
   });
+});
+
+// Debug Env (Check if vars exist)
+app.get('/api/debug-env', (req, res) => {
+  res.json({
+    DB_NAME: !!process.env.DB_NAME,
+    DB_USER: !!process.env.DB_USER,
+    DB_HOST: !!process.env.DB_HOST,
+    DB_PASSWORD: !!process.env.DB_PASSWORD,
+    VERCEL: !!process.env.VERCEL,
+    NODE_ENV: process.env.NODE_ENV
+  });
+});
+
+// Database Connection
+if (sequelize) {
+  sequelize.authenticate()
+    .then(() => {
+      console.log('TiDB/MySQL Connected');
+      return sequelize.sync(); // Sync models with database
+    })
+    .then(() => {
+      console.log('Database Synced');
+    })
+    .catch(err => {
+      console.error('Database Connection Error:', err);
+      dbError = err.message;
+    });
+}
 
 // Routes
 app.use('/api/auth', authRoutes);
