@@ -69,8 +69,42 @@ const SOSButton = () => {
       position: 'fixed',
       bottom: '90px', // Above mobile nav
       right: '20px',
-      zIndex: 1000
+      zIndex: 1000,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: '10px'
     }}>
+      {/* Siren Button */}
+      <motion.button
+        className="btn-siren"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        animate={{
+          backgroundColor: sirenActive ? '#ff9800' : '#ffb74d',
+          scale: sirenActive ? [1, 1.2, 1] : 1,
+        }}
+        transition={{ repeat: sirenActive ? Infinity : 0, duration: 0.5 }}
+        onClick={toggleSiren}
+        style={{
+            width: '50px',
+            height: '50px',
+            borderRadius: '50%',
+            border: 'none',
+            color: 'white',
+            fontSize: '24px',
+            cursor: 'pointer',
+            boxShadow: '0 4px 14px rgba(255, 152, 0, 0.4)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+        }}
+        title="Toggle Siren"
+      >
+        {sirenActive ? '🔇' : '🔊'}
+      </motion.button>
+
+      {/* SOS Button */}
       <motion.button
         className="btn-sos"
         whileHover={{ scale: 1.1 }}

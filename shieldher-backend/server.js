@@ -110,6 +110,8 @@ const safeRoute = (importer, name) => {
     // Force bundling of dependencies
     require('./middleware/rateLimiter');
     require('./middleware/validationMiddleware');
+    require('xss-clean');
+    require('hpp');
     
     return importer();
   } catch (err) {
