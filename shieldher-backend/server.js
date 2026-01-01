@@ -16,9 +16,14 @@ const postRoutes = require('./routes/postRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const friendRoutes = require('./routes/friendRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const sosRoutes = require('./routes/sosRoutes');
 
 const app = express();
 const isVercel = !!process.env.VERCEL;
+
+if (isVercel) {
+  app.set('trust proxy', 1); // Trust first proxy for Vercel
+}
 
 // Security Middleware
 app.use(helmet({

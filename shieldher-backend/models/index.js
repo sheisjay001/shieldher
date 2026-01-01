@@ -50,6 +50,10 @@ Comment.belongsTo(Post, { foreignKey: 'postId', as: 'post' });
 // Report Associations
 Report.belongsTo(User, { foreignKey: 'reporterId', as: 'reporter' });
 
+// SOSAlert Associations
+User.hasMany(SOSAlert, { foreignKey: 'userId', as: 'sosAlerts' });
+SOSAlert.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
 module.exports = {
   sequelize,
   User,
