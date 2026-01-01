@@ -99,7 +99,7 @@ const SOSButton = () => {
             right: 0,
             bottom: 0,
             borderRadius: '50px',
-            backgroundColor: '#ef4444',
+            backgroundColor: '#FF5252',
             zIndex: -1
           }}
         />

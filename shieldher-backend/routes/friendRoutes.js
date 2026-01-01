@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const { User, FriendRequest } = require('../models');
 const { Op } = require('sequelize');
+const { validateRequest, schemas } = require('../middleware/validationMiddleware');
 
 // Send Friend Request
-router.post('/request/:userId', async (req, res) => {
+router.post('/request/:userId', validateRequest(schemas.friendRequest), async (req, res) => {
   try {
     const { userId } = req.params; // Receiver ID
     const senderId = req.body.senderId; // In a real app, get this from auth middleware req.user.id

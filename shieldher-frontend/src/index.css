@@ -1,58 +1,61 @@
 :root {
-  /* Refined Palette for World-Class Feel */
-  --primary-color: #6a1b9a; /* Deep Purple - Identity */
-  --secondary-color: #00e676; /* Teal/Emerald - Safety/Success */
-  --accent-color: #ef4444; /* Coral/Red - Emergency/SOS */
+  /* World-Class Safety Palette (Dark Mode - Default) */
+  --primary-color: #26A69A; /* Teal 400 - Readable on dark */
+  --primary-dark: #004D40;  /* Deep Teal - Backgrounds/Headers */
+  --secondary-color: #80CBC4; /* Soft Mint */
+  --accent-color: #FF5252; /* Vivid Coral - SOS/Emergency */
   
   /* Backgrounds */
-  --background-color: #0f172a; /* Slate 900 */
-  --surface-color: #1e293b; /* Slate 800 */
-  --surface-hover: #334155; /* Slate 700 */
+  --background-color: #0a192f; /* Deep Navy */
+  --surface-color: #112240; /* Light Navy */
+  --surface-hover: #233554; /* Lighter Navy */
   
   /* Text */
-  --text-primary: #f8fafc; /* Slate 50 */
-  --text-secondary: #94a3b8; /* Slate 400 */
+  --text-primary: #e6f1ff; /* Lightest Blue/White */
+  --text-secondary: #8892b0; /* Slate Blue */
   
   /* Borders & UI */
-  --border-color: #334155;
-  --input-background: #1e293b;
-  --message-sent: #7c3aed; /* Violet 600 */
-  --message-received: #334155;
-  --online-color: #10b981; /* Emerald 500 */
-  --primary-hover: #7c3aed;
+  --border-color: #233554;
+  --input-background: #112240;
+  --message-sent: #00695C; /* Teal 800 */
+  --message-received: #233554;
+  --online-color: #00e676; /* Bright Green */
+  --primary-hover: #4DB6AC;
   
   /* Glassmorphism */
-  --glass-bg: rgba(30, 41, 59, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(17, 34, 64, 0.75);
+  --glass-border: rgba(100, 255, 218, 0.1);
   --glass-blur: 12px;
 }
 
 body.light-mode {
-  --primary-color: #7c3aed;
-  --secondary-color: #10b981;
-  --accent-color: #ef4444;
+  /* World-Class Safety Palette (Light Mode) */
+  --primary-color: #00695C; /* Teal 800 */
+  --primary-dark: #004D40;
+  --secondary-color: #009688; /* Teal 500 */
+  --accent-color: #FF5252; /* Vivid Coral */
   
-  --background-color: #f8fafc; /* Slate 50 */
+  --background-color: #F5F7FA; /* Cool Grey */
   --surface-color: #ffffff;
-  --surface-hover: #f1f5f9; /* Slate 100 */
+  --surface-hover: #E0F2F1; /* Very Pale Teal */
   
-  --text-primary: #0f172a; /* Slate 900 */
-  --text-secondary: #64748b; /* Slate 500 */
+  --text-primary: #0a192f; /* Deep Navy */
+  --text-secondary: #4a5568; /* Slate 600 */
   
-  --border-color: #e2e8f0;
+  --border-color: #cbd5e0;
   --input-background: #ffffff;
-  --message-sent: #ddd6fe; /* Violet 100 */
+  --message-sent: #B2DFDB; /* Teal 100 */
   --message-received: #f1f5f9;
   --online-color: #10b981;
-  --primary-hover: #6d28d9;
+  --primary-hover: #004D40;
   
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(0, 0, 0, 0.05);
 }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -130,11 +133,11 @@ a:hover {
   border-radius: 50px;
   font-weight: bold;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 4px 14px rgba(255, 82, 82, 0.4);
   transition: all 0.2s;
 }
 
 .btn-sos:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+  box-shadow: 0 6px 20px rgba(255, 82, 82, 0.6);
 }
