@@ -8,15 +8,7 @@ const { Server } = require('socket.io');
 const { sequelize } = require('./models'); // Import sequelize from models/index.js
 require('dotenv').config();
 
-const authRoutes = require('./routes/authRoutes');
-const messageRoutes = require('./routes/messageRoutes');
-const userRoutes = require('./routes/userRoutes');
-const verificationRoutes = require('./routes/verificationRoutes');
-const postRoutes = require('./routes/postRoutes');
-const reportRoutes = require('./routes/reportRoutes');
-const friendRoutes = require('./routes/friendRoutes');
-const adminRoutes = require('./routes/adminRoutes');
-const sosRoutes = require('./routes/sosRoutes');
+
 
 const app = express();
 const isVercel = !!process.env.VERCEL;
@@ -104,16 +96,26 @@ if (sequelize) {
     });
 }
 
+// Safe Route Loading Helper
+const safeRoute = (path) => {
+  try {
+    return require(path);
+  } catch (err) {
+    console.error(`Failed to load route ${path}:`, err);
+    return (req, res) => res.status(500).json({ error: `Route unavailable: ${err.message}` });
+  }
+};
+
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/messages', messageRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/verification', verificationRoutes);
-app.use('/api/posts', postRoutes);
-app.use('/api/reports', reportRoutes);
-app.use('/api/friends', friendRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/sos', sosRoutes);
+app.use('/api/auth', safeRoute('./routes/authRoutes'));
+app.use('/api/messages', safeRoute('./routes/messageRoutes'));
+app.use('/api/users', safeRoute('./routes/userRoutes'));
+app.use('/api/verification', safeRoute('./routes/verificationRoutes'));
+app.use('/api/posts', safeRoute('./routes/postRoutes'));
+app.use('/api/reports', safeRoute('./routes/reportRoutes'));
+app.use('/api/friends', safeRoute('./routes/friendRoutes'));
+app.use('/api/admin', safeRoute('./routes/adminRoutes'));
+app.use('/api/sos', safeRoute('./routes/sosRoutes'));
 
 // Make uploads folder public
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
