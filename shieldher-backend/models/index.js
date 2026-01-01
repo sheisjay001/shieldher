@@ -6,6 +6,7 @@ const Comment = require('./Comment');
 const PostLike = require('./PostLike');
 const Report = require('./Report');
 const FriendRequest = require('./FriendRequest');
+const SOSAlert = require('./SOSAlert');
 
 // User Associations
 User.hasMany(Message, { foreignKey: 'senderId', as: 'sentMessages' });
