@@ -105,25 +105,25 @@ if (sequelize) {
 }
 
 // Safe Route Loading Helper
-const safeRoute = (path) => {
+const safeRoute = (importer, name) => {
   try {
-    return require(path);
+    return importer();
   } catch (err) {
-    console.error(`Failed to load route ${path}:`, err);
+    console.error(`Failed to load route ${name}:`, err);
     return (req, res) => res.status(500).json({ error: `Route unavailable: ${err.message}` });
   }
 };
 
 // Routes
-app.use('/api/auth', safeRoute('./routes/authRoutes'));
-app.use('/api/messages', safeRoute('./routes/messageRoutes'));
-app.use('/api/users', safeRoute('./routes/userRoutes'));
-app.use('/api/verification', safeRoute('./routes/verificationRoutes'));
-app.use('/api/posts', safeRoute('./routes/postRoutes'));
-app.use('/api/reports', safeRoute('./routes/reportRoutes'));
-app.use('/api/friends', safeRoute('./routes/friendRoutes'));
-app.use('/api/admin', safeRoute('./routes/adminRoutes'));
-app.use('/api/sos', safeRoute('./routes/sosRoutes'));
+app.use('/api/auth', safeRoute(() => require('./routes/authRoutes'), 'authRoutes'));
+app.use('/api/messages', safeRoute(() => require('./routes/messageRoutes'), 'messageRoutes'));
+app.use('/api/users', safeRoute(() => require('./routes/userRoutes'), 'userRoutes'));
+app.use('/api/verification', safeRoute(() => require('./routes/verificationRoutes'), 'verificationRoutes'));
+app.use('/api/posts', safeRoute(() => require('./routes/postRoutes'), 'postRoutes'));
+app.use('/api/reports', safeRoute(() => require('./routes/reportRoutes'), 'reportRoutes'));
+app.use('/api/friends', safeRoute(() => require('./routes/friendRoutes'), 'friendRoutes'));
+app.use('/api/admin', safeRoute(() => require('./routes/adminRoutes'), 'adminRoutes'));
+app.use('/api/sos', safeRoute(() => require('./routes/sosRoutes'), 'sosRoutes'));
 
 // Make uploads folder public
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
