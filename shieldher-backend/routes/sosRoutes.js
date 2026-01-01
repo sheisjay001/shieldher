@@ -31,7 +31,7 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 // Get User's Alert History
-router.get('/history', authMiddleware, async (req, res) => {
+router.get('/history', protect, async (req, res) => {
   try {
     const alerts = await SOSAlert.findAll({
       where: { userId: req.user.id },
