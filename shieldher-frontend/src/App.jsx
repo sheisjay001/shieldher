@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Navbar';
@@ -12,6 +13,7 @@ import Community from './pages/Community';
 import Home from './pages/Home';
 import Friends from './pages/Friends';
 import AdminDashboard from './pages/AdminDashboard';
+import SOSButton from './components/SOSButton';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
@@ -27,6 +29,15 @@ function App() {
     <AuthProvider>
       <ThemeProvider>
         <Router>
+          <Toaster 
+            position="top-center" 
+            toastOptions={{
+              style: {
+                background: '#333',
+                color: '#fff',
+              },
+            }}
+          />
           <Navbar />
           <Routes>
           <Route path="/" element={<Home />} />
@@ -58,6 +69,7 @@ function App() {
             </ProtectedRoute>
           } />
         </Routes>
+          <SOSButton />
           <MobileNav />
         </Router>
       </ThemeProvider>
