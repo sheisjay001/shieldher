@@ -1,5 +1,7 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
+// Explicitly require mysql2 for Vercel/Webpack bundling
+const mysql2 = require('mysql2');
 
 const sequelize = new Sequelize(
   process.env.DB_NAME,
@@ -9,6 +11,7 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     dialect: 'mysql',
+    dialectModule: mysql2, // Force Sequelize to use the required mysql2 module
     dialectOptions: {
       ssl: {
         require: true,
