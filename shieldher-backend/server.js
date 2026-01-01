@@ -5,10 +5,18 @@ const rateLimit = require('express-rate-limit');
 const http = require('http');
 const path = require('path');
 const { Server } = require('socket.io');
-const { sequelize } = require('./models'); // Import sequelize from models/index.js
-require('dotenv').config();
+require('dotenv').config(); // Load env vars before models
 
+let sequelize;
 let dbError = null;
+
+try {
+  const models = require('./models'); // Import sequelize from models/index.js
+  sequelize = models.sequelize;
+} catch (err) {
+  console.error("Critical Error: Failed to load models:", err);
+  dbError = err.message || "Failed to load models";
+}
 
 const app = express();
 const isVercel = !!process.env.VERCEL;
