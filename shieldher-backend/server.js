@@ -107,6 +107,10 @@ if (sequelize) {
 // Safe Route Loading Helper
 const safeRoute = (importer, name) => {
   try {
+    // Force bundling of dependencies
+    require('./middleware/rateLimiter');
+    require('./middleware/validationMiddleware');
+    
     return importer();
   } catch (err) {
     console.error(`Failed to load route ${name}:`, err);
