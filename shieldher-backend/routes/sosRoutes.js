@@ -3,8 +3,11 @@ const router = express.Router();
 const { SOSAlert, User } = require('../models');
 const authMiddleware = require('../middleware/authMiddleware');
 
+// Robust middleware extractor
+const protect = authMiddleware.protect || authMiddleware;
+
 // Create SOS Alert
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', protect, async (req, res) => {
   try {
     const { latitude, longitude } = req.body;
     
